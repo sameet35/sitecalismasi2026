@@ -1,0 +1,34 @@
+name: Gunluk Hit Botu
+on:
+  schedule:
+    - cron: '*/30 * * * *' # Her 30 dakikada bir çalışır
+  workflow_dispatch: # İstediğinde elle başlatmak için buton ekler
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodları indir
+        uses: actions/checkout@v4
+
+      - name: Python Kur
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Playwright ve Bağımlılıkları Yükle
+        run: |
+          pip install playwright
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Botu Calistir
+        run: python bot.py
+
+      - name: Loglari Kaydet # Ziyaret geçmişini depoya geri yükler
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add ziyaret_basarili.txt
+          git commit -m "Ziyaret logu güncellendi" || exit 0
+          git push
